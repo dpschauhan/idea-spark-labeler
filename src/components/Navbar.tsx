@@ -3,6 +3,7 @@ import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Home, HelpCircle, Lightbulb } from 'lucide-react';
+import { ThemeToggle } from './ThemeToggle';
 
 const Navbar = () => {
   const location = useLocation();
@@ -47,6 +48,7 @@ const Navbar = () => {
               <span className="hidden sm:inline">FAQ</span>
             </Link>
           </Button>
+          <ThemeToggle />
         </div>
       </div>
     </nav>
