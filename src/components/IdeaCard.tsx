@@ -1,281 +1,244 @@
 
 import React, { useState } from 'react';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { useIdeas, type Idea } from '@/context/IdeaContext';
+import { Star, ThumbsDown, Trash2, Edit, Share, Calendar, CheckCheck, MessageSquare } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { formatDistanceToNow } from 'date-fns';
 import { Badge } from '@/components/ui/badge';
-import { Star, ThumbsDown, Trash, Share, Edit } from 'lucide-react';
-import { Idea, useIdeas } from '@/context/IdeaContext';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
+import CommentSection from '@/components/CommentSection';
 
 interface IdeaCardProps {
   idea: Idea;
 }
 
 const IdeaCard: React.FC<IdeaCardProps> = ({ idea }) => {
-  const { setLabel, deleteIdea, shareIdea, updateIdea } = useIdeas();
-  const [shareEmail, setShareEmail] = useState('');
+  const { deleteIdea, setLabel, updateIdea, shareIdea, categories } = useIdeas();
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
+  const [shareEmail, setShareEmail] = useState('');
   const [editDialogOpen, setEditDialogOpen] = useState(false);
-  const [editedIdea, setEditedIdea] = useState({
-    title: idea.title,
-    description: idea.description,
-    category: idea.category || ''
-  });
+  const [editedIdea, setEditedIdea] = useState<Idea>(idea);
   
-  const formattedDate = new Intl.DateTimeFormat('en-US', {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-  }).format(new Date(idea.createdAt));
-
-  const handleShare = () => {
-    if (shareEmail) {
-      shareIdea(idea.id, shareEmail);
-      setShareEmail('');
-      setShareDialogOpen(false);
+  const handleShareSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!shareEmail.trim() || !validateEmail(shareEmail)) {
+      return;
     }
+    
+    shareIdea(idea.id, shareEmail.trim());
+    setShareEmail('');
+    setShareDialogOpen(false);
   };
-
-  const handleSaveEdit = () => {
+  
+  const validateEmail = (email: string) => {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  };
+  
+  const handleEditSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!editedIdea.title.trim()) {
+      return;
+    }
+    
     updateIdea(idea.id, {
-      title: editedIdea.title,
-      description: editedIdea.description,
-      category: editedIdea.category || undefined
+      title: editedIdea.title.trim(),
+      description: editedIdea.description.trim(),
+      category: editedIdea.category,
     });
+    
     setEditDialogOpen(false);
   };
-
+  
+  const commentsCount = idea.comments?.length || 0;
+  
   return (
-    <>
-      <Card className="idea-card animate-in">
-        <CardHeader className="pb-2">
-          <div className="flex justify-between items-start">
-            <CardTitle className="text-xl">{idea.title}</CardTitle>
-            {idea.label && (
-              <Badge variant={idea.label === 'best' ? 'default' : 'destructive'} className="ml-2">
-                {idea.label === 'best' ? 'Best Idea' : 'Worst Idea'}
+    <Card className={`${idea.label === 'best' ? 'border-yellow-300' : idea.label === 'worst' ? 'border-red-300' : ''}`}>
+      <CardHeader className="pb-2">
+        <div className="flex justify-between items-start">
+          <div>
+            <h3 className="font-semibold">{idea.title}</h3>
+            {idea.category && (
+              <Badge variant="outline" className="mt-1">
+                {idea.category}
               </Badge>
             )}
           </div>
-          <CardDescription className="flex items-center justify-between">
-            <span>{formattedDate}</span>
-            {idea.shared && (
-              <Badge variant="outline" className="ml-2">
-                Shared
-              </Badge>
-            )}
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <p className="text-sm text-gray-600 whitespace-pre-wrap">{idea.description}</p>
-          {idea.category && (
-            <Badge variant="secondary" className="mt-2">
-              {idea.category}
-            </Badge>
-          )}
-          {idea.collaborators && idea.collaborators.length > 0 && (
-            <div className="mt-2">
-              <p className="text-xs text-muted-foreground">Shared with:</p>
-              <div className="flex flex-wrap gap-1 mt-1">
-                {idea.collaborators.map((email, index) => (
-                  <Badge key={index} variant="outline" className="text-xs">
-                    {email}
-                  </Badge>
-                ))}
-              </div>
-            </div>
-          )}
-        </CardContent>
-        <CardFooter className="flex justify-between pt-2">
-          <div className="flex space-x-2">
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button 
-                    variant="ghost" 
-                    size="icon" 
-                    className={idea.label === 'best' ? 'text-yellow-500' : 'text-gray-500'}
-                    onClick={() => setLabel(idea.id, 'best')}
-                  >
-                    <Star className="h-4 w-4" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>{idea.label === 'best' ? 'Remove best label' : 'Mark as best idea'}</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-            
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button 
-                    variant="ghost" 
-                    size="icon" 
-                    className={idea.label === 'worst' ? 'text-red-500' : 'text-gray-500'}
-                    onClick={() => setLabel(idea.id, 'worst')}
-                  >
-                    <ThumbsDown className="h-4 w-4" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>{idea.label === 'worst' ? 'Remove worst label' : 'Mark as worst idea'}</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
+          <div className="flex space-x-0.5">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setLabel(idea.id, 'best')}
+              className={idea.label === 'best' ? 'text-yellow-500' : ''}
+            >
+              <Star className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setLabel(idea.id, 'worst')}
+              className={idea.label === 'worst' ? 'text-red-500' : ''}
+            >
+              <ThumbsDown className="h-4 w-4" />
+            </Button>
           </div>
-          
-          <div className="flex space-x-1">
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button 
-                    variant="ghost" 
-                    size="icon" 
-                    className="text-gray-500 hover:text-blue-500"
-                    onClick={() => setEditDialogOpen(true)}
-                  >
-                    <Edit className="h-4 w-4" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Edit idea</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-            
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button 
-                    variant="ghost" 
-                    size="icon" 
-                    className="text-gray-500 hover:text-green-500"
-                    onClick={() => setShareDialogOpen(true)}
-                  >
-                    <Share className="h-4 w-4" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Share idea</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-            
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button 
-                    variant="ghost" 
-                    size="icon" 
-                    className="text-gray-500 hover:text-red-500"
-                    onClick={() => deleteIdea(idea.id)}
-                  >
-                    <Trash className="h-4 w-4" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Delete idea</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
+        </div>
+      </CardHeader>
+      <CardContent>
+        <p className="text-sm text-muted-foreground whitespace-pre-line">{idea.description}</p>
+        
+        <div className="flex items-center mt-3 space-x-2 text-xs text-muted-foreground">
+          <Calendar className="h-3.5 w-3.5" />
+          <span>Created {formatDistanceToNow(idea.createdAt, { addSuffix: true })}</span>
+        </div>
+        
+        {idea.shared && (
+          <div className="flex items-center mt-1 text-xs text-blue-500">
+            <CheckCheck className="h-3.5 w-3.5 mr-1" />
+            <span>
+              Shared with {idea.collaborators?.length || 0} {idea.collaborators?.length === 1 ? 'person' : 'people'}
+            </span>
           </div>
-        </CardFooter>
-      </Card>
-
+        )}
+        
+        {commentsCount > 0 && (
+          <div className="flex items-center mt-1 text-xs text-green-500">
+            <MessageSquare className="h-3.5 w-3.5 mr-1" />
+            <span>
+              {commentsCount} {commentsCount === 1 ? 'comment' : 'comments'}
+            </span>
+          </div>
+        )}
+      </CardContent>
+      <CardFooter className="flex justify-between pt-0">
+        <div className="flex space-x-1">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setEditDialogOpen(true)}
+          >
+            <Edit className="h-3.5 w-3.5 mr-1" />
+            Edit
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => deleteIdea(idea.id)}
+          >
+            <Trash2 className="h-3.5 w-3.5 mr-1" />
+            Delete
+          </Button>
+        </div>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => setShareDialogOpen(true)}
+        >
+          <Share className="h-3.5 w-3.5 mr-1" />
+          Share
+        </Button>
+      </CardFooter>
+      
+      <CommentSection ideaId={idea.id} />
+      
       {/* Share Dialog */}
       <Dialog open={shareDialogOpen} onOpenChange={setShareDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Share This Idea</DialogTitle>
+            <DialogTitle>Share Idea</DialogTitle>
+            <DialogDescription>
+              Enter the email of the person you want to share "{idea.title}" with.
+            </DialogDescription>
           </DialogHeader>
-          <div className="py-4">
-            <p className="text-sm text-muted-foreground mb-4">
-              Enter email address to collaborate with your teammate on this idea
-            </p>
-            <Input
-              type="email"
-              placeholder="colleague@example.com"
-              value={shareEmail}
-              onChange={(e) => setShareEmail(e.target.value)}
-              className="mb-2"
-            />
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setShareDialogOpen(false)}>Cancel</Button>
-            <Button onClick={handleShare}>Share</Button>
-          </DialogFooter>
+          <form onSubmit={handleShareSubmit}>
+            <div className="space-y-4 py-4">
+              <Input
+                placeholder="colleague@example.com"
+                value={shareEmail}
+                onChange={(e) => setShareEmail(e.target.value)}
+                type="email"
+                required
+              />
+            </div>
+            <DialogFooter>
+              <Button type="submit" disabled={!shareEmail.trim() || !validateEmail(shareEmail)}>
+                Share
+              </Button>
+            </DialogFooter>
+          </form>
         </DialogContent>
       </Dialog>
-
+      
       {/* Edit Dialog */}
       <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
-        <DialogContent className="sm:max-w-[525px]">
+        <DialogContent>
           <DialogHeader>
             <DialogTitle>Edit Idea</DialogTitle>
+            <DialogDescription>
+              Make changes to your idea below.
+            </DialogDescription>
           </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <div className="grid grid-cols-4 items-center gap-4">
-              <label htmlFor="title" className="text-right text-sm font-medium">
-                Title
-              </label>
-              <Input
-                id="title"
-                value={editedIdea.title}
-                onChange={(e) => setEditedIdea({...editedIdea, title: e.target.value})}
-                className="col-span-3"
-              />
+          <form onSubmit={handleEditSubmit}>
+            <div className="space-y-4 py-4">
+              <div className="space-y-2">
+                <label htmlFor="title" className="text-sm font-medium">Title</label>
+                <Input
+                  id="title"
+                  value={editedIdea.title}
+                  onChange={(e) => setEditedIdea({ ...editedIdea, title: e.target.value })}
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <label htmlFor="description" className="text-sm font-medium">Description</label>
+                <Textarea
+                  id="description"
+                  value={editedIdea.description}
+                  onChange={(e) => setEditedIdea({ ...editedIdea, description: e.target.value })}
+                  rows={5}
+                />
+              </div>
+              <div className="space-y-2">
+                <label htmlFor="category" className="text-sm font-medium">Category</label>
+                <Select 
+                  value={editedIdea.category} 
+                  onValueChange={(value) => setEditedIdea({ ...editedIdea, category: value })}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a category" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="">No category</SelectItem>
+                    {categories.map((category) => (
+                      <SelectItem key={category} value={category}>
+                        {category}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <label htmlFor="category" className="text-right text-sm font-medium">
-                Category
-              </label>
-              <Select 
-                value={editedIdea.category} 
-                onValueChange={(value) => setEditedIdea({...editedIdea, category: value})}
-              >
-                <SelectTrigger className="col-span-3">
-                  <SelectValue placeholder="Select a category" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Business">Business</SelectItem>
-                  <SelectItem value="Technology">Technology</SelectItem>
-                  <SelectItem value="Health">Health</SelectItem>
-                  <SelectItem value="Education">Education</SelectItem>
-                  <SelectItem value="Entertainment">Entertainment</SelectItem>
-                  <SelectItem value="Travel">Travel</SelectItem>
-                  <SelectItem value="Food">Food</SelectItem>
-                  <SelectItem value="Fashion">Fashion</SelectItem>
-                  <SelectItem value="Sports">Sports</SelectItem>
-                  <SelectItem value="Other">Other</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="grid grid-cols-4 items-start gap-4">
-              <label htmlFor="description" className="text-right text-sm font-medium pt-2">
-                Description
-              </label>
-              <Textarea
-                id="description"
-                value={editedIdea.description}
-                onChange={(e) => setEditedIdea({...editedIdea, description: e.target.value})}
-                className="col-span-3"
-                rows={4}
-              />
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setEditDialogOpen(false)}>Cancel</Button>
-            <Button onClick={handleSaveEdit}>Save Changes</Button>
-          </DialogFooter>
+            <DialogFooter>
+              <Button type="submit" disabled={!editedIdea.title.trim()}>
+                Save Changes
+              </Button>
+            </DialogFooter>
+          </form>
         </DialogContent>
       </Dialog>
-    </>
+    </Card>
   );
 };
 

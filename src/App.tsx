@@ -11,6 +11,9 @@ import Index from "./pages/Index";
 import Ideas from "./pages/Ideas";
 import FAQ from "./pages/FAQ";
 import NotFound from "./pages/NotFound";
+import Analytics from "./pages/Analytics";
+import Categories from "./pages/Categories";
+import Templates from "./pages/Templates";
 
 const queryClient = new QueryClient();
 
@@ -25,6 +28,9 @@ const App = () => (
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/ideas" element={<Ideas />} />
+              <Route path="/analytics" element={<Analytics />} />
+              <Route path="/categories" element={<Categories />} />
+              <Route path="/templates" element={<Templates />} />
               <Route path="/faq" element={<FAQ />} />
               <Route path="*" element={<NotFound />} />
             </Routes>

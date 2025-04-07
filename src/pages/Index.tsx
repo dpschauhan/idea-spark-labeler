@@ -2,7 +2,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
-import { ArrowRight, Lightbulb, Star, ThumbsDown } from 'lucide-react';
+import { ArrowRight, Lightbulb, Star, ThumbsDown, BarChart2, LayoutGrid, Template, MessageSquare, FileText } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import ImageShowcase from '@/components/ImageShowcase';
 
@@ -79,8 +79,78 @@ const Index = () => {
           </div>
         </section>
         
-        {/* New Image Showcase Section */}
+        {/* New Features Section */}
         <section className="py-12 bg-secondary/30">
+          <div className="container px-4 md:px-6">
+            <div className="text-center mb-10">
+              <h2 className="text-3xl font-bold tracking-tighter">Packed with Features</h2>
+              <p className="text-muted-foreground mt-2">
+                Everything you need to manage your creative process
+              </p>
+            </div>
+            
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+              <Link to="/analytics" className="group">
+                <div className="bg-background p-6 rounded-lg shadow-sm border h-full transition-all hover:shadow-md hover:border-primary/50">
+                  <div className="text-primary mb-4 flex justify-center">
+                    <div className="p-3 bg-primary/10 rounded-full">
+                      <BarChart2 className="h-6 w-6" />
+                    </div>
+                  </div>
+                  <h3 className="text-xl font-semibold mb-2 text-center group-hover:text-primary transition-colors">Analytics Dashboard</h3>
+                  <p className="text-muted-foreground text-center">
+                    Visualize your ideas with beautiful charts and statistics.
+                  </p>
+                </div>
+              </Link>
+              
+              <Link to="/categories" className="group">
+                <div className="bg-background p-6 rounded-lg shadow-sm border h-full transition-all hover:shadow-md hover:border-primary/50">
+                  <div className="text-primary mb-4 flex justify-center">
+                    <div className="p-3 bg-primary/10 rounded-full">
+                      <LayoutGrid className="h-6 w-6" />
+                    </div>
+                  </div>
+                  <h3 className="text-xl font-semibold mb-2 text-center group-hover:text-primary transition-colors">Category Management</h3>
+                  <p className="text-muted-foreground text-center">
+                    Organize your ideas with customizable categories.
+                  </p>
+                </div>
+              </Link>
+              
+              <Link to="/templates" className="group">
+                <div className="bg-background p-6 rounded-lg shadow-sm border h-full transition-all hover:shadow-md hover:border-primary/50">
+                  <div className="text-primary mb-4 flex justify-center">
+                    <div className="p-3 bg-primary/10 rounded-full">
+                      <Template className="h-6 w-6" />
+                    </div>
+                  </div>
+                  <h3 className="text-xl font-semibold mb-2 text-center group-hover:text-primary transition-colors">Idea Templates</h3>
+                  <p className="text-muted-foreground text-center">
+                    Create reusable templates for different types of ideas.
+                  </p>
+                </div>
+              </Link>
+              
+              <Link to="/ideas" className="group">
+                <div className="bg-background p-6 rounded-lg shadow-sm border h-full transition-all hover:shadow-md hover:border-primary/50">
+                  <div className="text-primary mb-4 flex justify-center">
+                    <div className="p-3 bg-primary/10 rounded-full">
+                      <MessageSquare className="h-6 w-6" />
+                    </div>
+                  </div>
+                  <h3 className="text-xl font-semibold mb-2 text-center group-hover:text-primary transition-colors">Comments & Sharing</h3>
+                  <p className="text-muted-foreground text-center">
+                    Collaborate with others and discuss ideas together.
+                  </p>
+                </div>
+              </Link>
+            </div>
+          </div>
+        </section>
+        
+        {/* Image Showcase Section */}
+        <section className="py-12 bg-secondary/50">
           <div className="container px-4 md:px-6">
             <div className="text-center mb-10">
               <h2 className="text-3xl font-bold tracking-tighter">Visualize Your Innovation Journey</h2>
@@ -93,12 +163,12 @@ const Index = () => {
         </section>
         
         {/* Features Section */}
-        <section className="py-12 bg-secondary/50">
+        <section className="py-12">
           <div className="container px-4 md:px-6">
             <div className="text-center mb-10">
               <h2 className="text-3xl font-bold tracking-tighter">Why Use IdeaSpark?</h2>
               <p className="text-muted-foreground mt-2">
-                Our simple platform helps you manage the entire idea lifecycle
+                Our platform helps you manage the entire idea lifecycle
               </p>
             </div>
             
@@ -118,9 +188,9 @@ const Index = () => {
               </div>
               
               <div className="bg-background p-6 rounded-lg shadow-sm border">
-                <h3 className="text-xl font-semibold mb-2">Easy Access</h3>
+                <h3 className="text-xl font-semibold mb-2">Export & Share</h3>
                 <p className="text-muted-foreground">
-                  Your ideas are saved locally so you can access them anytime, even offline.
+                  Export your ideas or share them with colleagues for feedback and collaboration.
                 </p>
               </div>
             </div>

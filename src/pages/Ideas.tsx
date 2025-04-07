@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Star, ThumbsDown, Flame, Share } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import ExportIdeas from '@/components/ExportIdeas';
 
 const Ideas = () => {
   const { ideas } = useIdeas();
@@ -53,7 +54,8 @@ const Ideas = () => {
             <p className="text-muted-foreground">Manage and organize your creative thoughts</p>
           </div>
           
-          <div className="w-full md:w-auto">
+          <div className="w-full md:w-auto flex gap-2">
+            <ExportIdeas />
             <AddIdeaForm />
           </div>
         </div>
