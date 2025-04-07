@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Lightbulb, Star, ThumbsDown } from 'lucide-react';
 import Navbar from '@/components/Navbar';
+import ImageShowcase from '@/components/ImageShowcase';
 
 const Index = () => {
   return (
@@ -75,6 +76,19 @@ const Index = () => {
                 </div>
               </div>
             </div>
+          </div>
+        </section>
+        
+        {/* New Image Showcase Section */}
+        <section className="py-12 bg-secondary/30">
+          <div className="container px-4 md:px-6">
+            <div className="text-center mb-10">
+              <h2 className="text-3xl font-bold tracking-tighter">Visualize Your Innovation Journey</h2>
+              <p className="text-muted-foreground mt-2">
+                From light bulb moments to fully developed concepts
+              </p>
+            </div>
+            <ImageShowcase />
           </div>
         </section>
         

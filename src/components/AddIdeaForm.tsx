@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { PlusCircle, X } from 'lucide-react';
+import { PlusCircle, X, Sparkles } from 'lucide-react';
 
 const categories = [
   'Business', 
@@ -58,11 +58,17 @@ const AddIdeaForm: React.FC = () => {
   }
 
   return (
-    <Card>
+    <Card className="relative overflow-hidden">
+      <div className="absolute top-[-50px] right-[-50px] w-[150px] h-[150px] bg-primary/10 rounded-full blur-2xl pointer-events-none" />
+      <div className="absolute bottom-[-30px] left-[-30px] w-[100px] h-[100px] bg-accent/10 rounded-full blur-xl pointer-events-none" />
+      
       <form onSubmit={handleSubmit}>
         <CardHeader className="pb-4">
           <div className="flex justify-between items-center">
-            <CardTitle>New Idea</CardTitle>
+            <div className="flex items-center">
+              <CardTitle>New Idea</CardTitle>
+              <Sparkles className="h-5 w-5 ml-2 text-yellow-500" />
+            </div>
             <Button 
               type="button" 
               variant="ghost" 
