@@ -9,6 +9,8 @@ export type Idea = {
   category?: string;
   label?: 'best' | 'worst' | null;
   createdAt: Date;
+  shared?: boolean;
+  collaborators?: string[];
 };
 
 type IdeaContextType = {
@@ -17,6 +19,7 @@ type IdeaContextType = {
   updateIdea: (id: string, updates: Partial<Idea>) => void;
   deleteIdea: (id: string) => void;
   setLabel: (id: string, label: 'best' | 'worst' | null) => void;
+  shareIdea: (id: string, email: string) => void;
 };
 
 const IdeaContext = createContext<IdeaContextType | undefined>(undefined);
@@ -89,8 +92,23 @@ export const IdeaProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  const shareIdea = (id: string, email: string) => {
+    setIdeas(
+      ideas.map((idea) => 
+        idea.id === id 
+          ? { 
+              ...idea, 
+              shared: true, 
+              collaborators: [...(idea.collaborators || []), email] 
+            } 
+          : idea
+      )
+    );
+    toast.success(`Idea shared with ${email}!`);
+  };
+
   return (
-    <IdeaContext.Provider value={{ ideas, addIdea, updateIdea, deleteIdea, setLabel }}>
+    <IdeaContext.Provider value={{ ideas, addIdea, updateIdea, deleteIdea, setLabel, shareIdea }}>
       {children}
     </IdeaContext.Provider>
   );

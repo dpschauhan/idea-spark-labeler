@@ -6,7 +6,7 @@ import IdeaCard from '@/components/IdeaCard';
 import AddIdeaForm from '@/components/AddIdeaForm';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
-import { Star, ThumbsDown, Flame } from 'lucide-react';
+import { Star, ThumbsDown, Flame, Share } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
@@ -14,6 +14,7 @@ const Ideas = () => {
   const { ideas } = useIdeas();
   const [searchTerm, setSearchTerm] = useState('');
   const [categoryFilter, setCategoryFilter] = useState<string | 'all'>('all');
+  const [viewFilter, setViewFilter] = useState<'all' | 'mine' | 'shared'>('all');
   
   // Get unique categories from ideas
   const categories = Array.from(
@@ -29,12 +30,17 @@ const Ideas = () => {
     const matchesCategory = categoryFilter === 'all' || 
       idea.category === categoryFilter;
     
-    return matchesSearch && matchesCategory;
+    const matchesView = viewFilter === 'all' || 
+      (viewFilter === 'shared' && idea.shared) || 
+      (viewFilter === 'mine' && !idea.shared);
+    
+    return matchesSearch && matchesCategory && matchesView;
   });
 
   const bestIdeas = filteredIdeas.filter(idea => idea.label === 'best');
   const worstIdeas = filteredIdeas.filter(idea => idea.label === 'worst');
   const unlabeledIdeas = filteredIdeas.filter(idea => !idea.label);
+  const sharedIdeas = filteredIdeas.filter(idea => idea.shared);
   
   return (
     <div className="min-h-screen flex flex-col">
@@ -62,19 +68,32 @@ const Ideas = () => {
             />
           </div>
           
-          <Select value={categoryFilter} onValueChange={(val) => setCategoryFilter(val)}>
-            <SelectTrigger>
-              <SelectValue placeholder="Filter by category" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Categories</SelectItem>
-              {categories.map((category) => (
-                <SelectItem key={category} value={category as string}>
-                  {category}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <div className="grid grid-cols-2 gap-2">
+            <Select value={categoryFilter} onValueChange={(val) => setCategoryFilter(val)}>
+              <SelectTrigger>
+                <SelectValue placeholder="Filter by category" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Categories</SelectItem>
+                {categories.map((category) => (
+                  <SelectItem key={category} value={category as string}>
+                    {category}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            
+            <Select value={viewFilter} onValueChange={(val: 'all' | 'mine' | 'shared') => setViewFilter(val)}>
+              <SelectTrigger>
+                <SelectValue placeholder="View" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Ideas</SelectItem>
+                <SelectItem value="mine">My Ideas</SelectItem>
+                <SelectItem value="shared">Shared Ideas</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </div>
         
         {filteredIdeas.length === 0 ? (
@@ -104,6 +123,11 @@ const Ideas = () => {
                 Worst
                 <Badge variant="secondary" className="ml-2">{worstIdeas.length}</Badge>
               </TabsTrigger>
+              <TabsTrigger value="shared" className="flex items-center gap-1">
+                <Share className="h-3.5 w-3.5 text-blue-500" />
+                Shared
+                <Badge variant="secondary" className="ml-2">{sharedIdeas.length}</Badge>
+              </TabsTrigger>
               <TabsTrigger value="unlabeled">
                 Unlabeled
                 <Badge variant="secondary" className="ml-2">{unlabeledIdeas.length}</Badge>
@@ -129,6 +153,14 @@ const Ideas = () => {
             <TabsContent value="worst" className="mt-0">
               <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
                 {worstIdeas.map((idea) => (
+                  <IdeaCard key={idea.id} idea={idea} />
+                ))}
+              </div>
+            </TabsContent>
+            
+            <TabsContent value="shared" className="mt-0">
+              <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+                {sharedIdeas.map((idea) => (
                   <IdeaCard key={idea.id} idea={idea} />
                 ))}
               </div>
