@@ -2,16 +2,16 @@
 import React from "react";
 import {
   Lightbulb,
-  ChartBarIcon,
+  BarChart3,
   Menu,
   X,
   LayoutGrid,
-  Template,
+  Layout,
   Bell,
 } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import ThemeToggle from "@/components/ThemeToggle";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import {
   Sheet,
   SheetContent,
@@ -26,9 +26,9 @@ const Navbar = () => {
 
   const navigationItems = [
     { path: "/ideas", label: "Ideas", icon: <Lightbulb className="h-4 w-4" /> },
-    { path: "/analytics", label: "Analytics", icon: <ChartBarIcon className="h-4 w-4" /> },
+    { path: "/analytics", label: "Analytics", icon: <BarChart3 className="h-4 w-4" /> },
     { path: "/categories", label: "Categories", icon: <LayoutGrid className="h-4 w-4" /> },
-    { path: "/templates", label: "Templates", icon: <Template className="h-4 w-4" /> },
+    { path: "/templates", label: "Templates", icon: <Layout className="h-4 w-4" /> },
     { path: "/faq", label: "FAQ", icon: null },
   ];
 

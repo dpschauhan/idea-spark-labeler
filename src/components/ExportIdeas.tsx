@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Download, FileText, FileCsv } from 'lucide-react';
+import { Download, FileText, Files } from 'lucide-react';
 import { useIdeas } from '@/context/IdeaContext';
 import {
   DropdownMenu,
@@ -104,7 +104,7 @@ const ExportIdeas = () => {
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         <DropdownMenuItem onClick={exportAsCsv}>
-          <FileCsv className="h-4 w-4 mr-2" />
+          <Files className="h-4 w-4 mr-2" />
           Export as CSV
         </DropdownMenuItem>
         <DropdownMenuItem onClick={exportAsText}>
